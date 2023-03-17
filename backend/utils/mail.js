@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 
 const generateOtp = (otpLength = 6) => {
-	const OTP = Math.floor(10**otpLength + Math.random() * (9 * 10**otpLength)).toString();
+	const OTP = Math.floor(10**(otpLength-1) + Math.random() * (9 * 10**(otpLength-1))).toString();
 	return OTP;
 }
 
