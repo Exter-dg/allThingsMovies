@@ -1,8 +1,19 @@
 const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
 const generateOtp = (otpLength = 6) => {
 	const OTP = Math.floor(10**(otpLength-1) + Math.random() * (9 * 10**(otpLength-1))).toString();
 	return OTP;
+}
+
+const generateRandomByte = async () => {
+	return new Promise((resolve, reject) => {
+		crypto.randomBytes(30, (err, buff) => {
+			if (err) reject(err);
+			const randomByte = buff.toString("hex");
+			resolve(randomByte);
+		});	
+	});
 }
 
 const createMailTransport = async () => {
@@ -19,5 +30,6 @@ const createMailTransport = async () => {
 
 module.exports = {
 	generateOtp,
-	createMailTransport
+	createMailTransport,
+	generateRandomByte
 }

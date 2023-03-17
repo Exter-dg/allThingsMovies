@@ -1,8 +1,9 @@
 const User = require("../models/user");
 const EmailVerificationToken = require("../models/emailVerificationToken");
 const { isValidObjectId } = require("mongoose");
-const { generateOtp, createMailTransport } = require("../utils/mail");
+const { generateOtp, createMailTransport, generateRandomByte } = require("../utils/mail");
 const { sendError } = require("../utils/helper");
+const PasswordResetToken = require("../models/passwordResetToken");
 
 const create = async (req, res) => {
 	const { name, email, password } = req.body;
@@ -47,13 +48,11 @@ const verifyEmail = async (req, res) => {
 	const user = await User.findById(userObjId);
 	if (!user) return sendError(res, "User not found", 401);
 
-	console.log(user);
 	if (user.isVerified) return sendError(res, "User already verified", 401);
 
 	const token = await EmailVerificationToken.findOne({ owner: userObjId });
 	if (!token) return sendError(res, "Token not found", 401);
 	
-	console.log(token);
 	const isMatched = await token.compareToken(OTP);
 	if (!isMatched) return sendError(res, "Invalid OTP", 401);
 
@@ -116,8 +115,73 @@ const resendEmailVerificationToken = async (req, res) => {
 		.json({ message: "Please verify your email. An OTP has been resent." });
 }
 
+const generateResetPasswordToken = async (req, res) => {
+	const { email } = req.body;
+
+	if (!email) return sendError(res, "Email must not be empty", 401);
+
+	const user = await User.findOne({ email:email });
+	if (!user) return sendError(res, "Email not found!!!", 401);
+
+	const existingToken = await PasswordResetToken.findOne({ owner: user._id });
+	if (existingToken) return sendError(res, "Only one OTP allowed per hour", 401);
+
+	const token = await generateRandomByte();
+	const passwordResetToken = new PasswordResetToken({
+		owner: user._id,
+		token: token
+	});
+
+	await passwordResetToken.save();
+	const passwordResetURL = `http://localhost:3000/reset-password?token=${token}&id=${user._id}`;
+
+	const transport = await createMailTransport();
+	await transport.sendMail({
+		from: "verification@allThingsMovies.com",
+		to: user.email,
+		subject: "Password Reset Link",
+		html: `
+		<h1>Click here to reset your password</h1>
+		<a href=${passwordResetURL}>Reset Password</a>`,
+	});
+	res
+		.status(201)
+		.json({ message: "A Password Reset link has been on your email" });
+}
+
+const resetPassword = async (req, res) => {
+	const { password } = req.body;
+
+	const passwordResetTokenID = req.passwordResetTokenID;
+	const user = req.user;
+
+	const samePassword = await user.comparePassword(password);
+	if (samePassword) return sendError(res, "Password cannot be same", 401);
+
+	user.password = password;
+	await Promise.all([
+		user.save(),
+		PasswordResetToken.findByIdAndDelete(passwordResetTokenID)
+	]);
+
+	const transport = await createMailTransport();
+	await transport.sendMail({
+		from: "verification@allThingsMovies.com",
+		to: user.email,
+		subject: "Password Reset Successful",
+		html: `
+		<p>Your password has been successfully changed</p>`,
+	});
+	res
+		.status(201)
+		.json({ message: "Password successfully changed" });
+	
+}
+
 module.exports = {
 	create,
 	verifyEmail,
-	resendEmailVerificationToken
+	resendEmailVerificationToken,
+	generateResetPasswordToken,
+	resetPassword
 };
