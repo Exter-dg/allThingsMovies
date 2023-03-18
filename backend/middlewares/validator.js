@@ -28,6 +28,15 @@ const passwordValidator = [
 		.withMessage("Password must be of 8-20 characters"),
 ];
 
+const signInValidator = [
+	check("email").isEmail().withMessage("Email format invalid").normalizeEmail(),
+	check("password")
+		.trim()
+		.not()
+		.isEmpty()
+		.withMessage("Password cannot be empty!!!")
+];
+
 const validate = (req, res, next) => {
 	const errors = validationResult(req).array();
 	if (errors.length > 0) {
@@ -39,5 +48,6 @@ const validate = (req, res, next) => {
 module.exports = {
 	userValidator,
 	passwordValidator,
+	signInValidator,
 	validate
 }

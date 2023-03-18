@@ -21,8 +21,8 @@ const createMailTransport = async () => {
 		host: "sandbox.smtp.mailtrap.io",
 		port: 2525,
 		auth: {
-			user: "86ba03979090e4",
-			pass: "54748fbcb621e3",
+			user: NODEMAILER_USER,
+			pass: NODEMAILER_PASS,
 		},
 	});
 	return transport;
