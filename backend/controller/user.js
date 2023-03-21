@@ -1,10 +1,14 @@
 const User = require("../models/user");
 const EmailVerificationToken = require("../models/emailVerificationToken");
 const { isValidObjectId } = require("mongoose");
-const { generateOtp, createMailTransport, generateRandomByte } = require("../utils/mail");
+const {
+	generateOtp,
+	createMailTransport,
+	generateRandomByte,
+} = require("../utils/mail");
 const { sendError } = require("../utils/helper");
 const PasswordResetToken = require("../models/passwordResetToken");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 const create = async (req, res) => {
 	const { name, email, password } = req.body;
@@ -37,14 +41,16 @@ const create = async (req, res) => {
 		<p>Your Verification OTP is</p>
 		<h1>${OTP}</h1>`,
 	});
-	res
-		.status(201)
-		.json({ message: "Please verify your email. An OTP has been sent." });
+	res.status(201).json({
+		user: { id: newUser._id, name: newUser.name, email: newUser.email },
+	});
 };
 
 const verifyEmail = async (req, res) => {
+	console.log(req.body);
 	const { userObjId, OTP } = req.body;
-	if (!isValidObjectId(userObjId)) return sendError(res, "Invalid User Id", 401);
+	if (!isValidObjectId(userObjId))
+		return sendError(res, "Invalid User Id", 401);
 
 	const user = await User.findById(userObjId);
 	if (!user) return sendError(res, "User not found", 401);
@@ -53,14 +59,14 @@ const verifyEmail = async (req, res) => {
 
 	const token = await EmailVerificationToken.findOne({ owner: userObjId });
 	if (!token) return sendError(res, "Token not found", 401);
-	
+
 	const isMatched = await token.compareToken(OTP);
 	if (!isMatched) return sendError(res, "Invalid OTP", 401);
 
 	user.isVerified = true;
 	await Promise.all([
 		user.save(),
-		EmailVerificationToken.findByIdAndDelete(token._id)
+		EmailVerificationToken.findByIdAndDelete(token._id),
 	]);
 
 	// Send welcome email
@@ -73,11 +79,9 @@ const verifyEmail = async (req, res) => {
 		html: `
 		<h1>We are excited to serve you at All Things Movies</h1>`,
 	});
-	
-	res
-		.status(201)
-		.json({ message: "Verification Successful" });
-}
+
+	res.status(201).json({ message: "Verification Successful" });
+};
 
 const resendEmailVerificationToken = async (req, res) => {
 	const { userObjId } = req.body;
@@ -88,8 +92,11 @@ const resendEmailVerificationToken = async (req, res) => {
 
 	if (user.isVerified) return sendError(res, "User already verified", 401);
 
-	const existingToken = await EmailVerificationToken.findOne({ owner: userObjId });
-	if (existingToken) return sendError(res, "Only one OTP allowed per hour", 401);
+	const existingToken = await EmailVerificationToken.findOne({
+		owner: userObjId,
+	});
+	if (existingToken)
+		return sendError(res, "Only one OTP allowed per hour", 401);
 
 	// Generate 6 digit otp
 	const OTP = generateOtp();
@@ -114,23 +121,24 @@ const resendEmailVerificationToken = async (req, res) => {
 	res
 		.status(201)
 		.json({ message: "Please verify your email. An OTP has been resent." });
-}
+};
 
 const generateResetPasswordToken = async (req, res) => {
 	const { email } = req.body;
 
 	if (!email) return sendError(res, "Email must not be empty", 401);
 
-	const user = await User.findOne({ email:email });
+	const user = await User.findOne({ email: email });
 	if (!user) return sendError(res, "Email not found!!!", 401);
 
 	const existingToken = await PasswordResetToken.findOne({ owner: user._id });
-	if (existingToken) return sendError(res, "Only one OTP allowed per hour", 401);
+	if (existingToken)
+		return sendError(res, "Only one OTP allowed per hour", 401);
 
 	const token = await generateRandomByte();
 	const passwordResetToken = new PasswordResetToken({
 		owner: user._id,
-		token: token
+		token: token,
 	});
 
 	await passwordResetToken.save();
@@ -148,7 +156,7 @@ const generateResetPasswordToken = async (req, res) => {
 	res
 		.status(201)
 		.json({ message: "A Password Reset link has been on your email" });
-}
+};
 
 const resetPassword = async (req, res) => {
 	const { password } = req.body;
@@ -162,7 +170,7 @@ const resetPassword = async (req, res) => {
 	user.password = password;
 	await Promise.all([
 		user.save(),
-		PasswordResetToken.findByIdAndDelete(passwordResetTokenID)
+		PasswordResetToken.findByIdAndDelete(passwordResetTokenID),
 	]);
 
 	const transport = await createMailTransport();
@@ -173,11 +181,8 @@ const resetPassword = async (req, res) => {
 		html: `
 		<p>Your password has been successfully changed</p>`,
 	});
-	res
-		.status(201)
-		.json({ message: "Password successfully changed" });
-	
-}
+	res.status(201).json({ message: "Password successfully changed" });
+};
 
 const signIn = async (req, res) => {
 	const { email, password } = req.body;
@@ -188,13 +193,10 @@ const signIn = async (req, res) => {
 	const isMatched = await user.comparePassword(password);
 	if (!isMatched) return sendError(res, "Email/Password mismatch!!!");
 
-	const jwtToken = jwt.sign({userObjId: user._id}, process.env.JWT_SECRET);
+	const jwtToken = jwt.sign({ userObjId: user._id }, process.env.JWT_SECRET);
 
-	res
-		.status(201)
-		.json({ id: user._id, name: user.name, email, jwt: jwtToken });
-
-}
+	res.status(201).json({ id: user._id, name: user.name, email, jwt: jwtToken });
+};
 
 module.exports = {
 	create,
@@ -202,5 +204,5 @@ module.exports = {
 	resendEmailVerificationToken,
 	generateResetPasswordToken,
 	resetPassword,
-	signIn
+	signIn,
 };

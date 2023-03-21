@@ -2,9 +2,11 @@ const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 
 const generateOtp = (otpLength = 6) => {
-	const OTP = Math.floor(10**(otpLength-1) + Math.random() * (9 * 10**(otpLength-1))).toString();
+	const OTP = Math.floor(
+		10 ** (otpLength - 1) + Math.random() * (9 * 10 ** (otpLength - 1))
+	).toString();
 	return OTP;
-}
+};
 
 const generateRandomByte = async () => {
 	return new Promise((resolve, reject) => {
@@ -12,24 +14,24 @@ const generateRandomByte = async () => {
 			if (err) reject(err);
 			const randomByte = buff.toString("hex");
 			resolve(randomByte);
-		});	
+		});
 	});
-}
+};
 
 const createMailTransport = async () => {
 	const transport = await nodemailer.createTransport({
 		host: "sandbox.smtp.mailtrap.io",
 		port: 2525,
 		auth: {
-			user: NODEMAILER_USER,
-			pass: NODEMAILER_PASS,
+			user: process.env.NODEMAILER_USER,
+			pass: process.env.NODEMAILER_PASS,
 		},
 	});
 	return transport;
-}
+};
 
 module.exports = {
 	generateOtp,
 	createMailTransport,
-	generateRandomByte
-}
+	generateRandomByte,
+};

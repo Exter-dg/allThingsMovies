@@ -6,6 +6,7 @@ import ForgetPassword from "./components/auth/ForgetPassword";
 import Signin from "./components/auth/Signin";
 import Signup from "./components/auth/Signup";
 import Home from "./components/Home";
+import NotFound from "./components/NotFound";
 import Navbar from "./components/user/Navbar";
 
 export default function App() {
@@ -25,6 +26,7 @@ export default function App() {
 				<Route
 					path="/auth/confirm-password"
 					element={<ConfirmPassword></ConfirmPassword>}></Route>
+				<Route path="*" element={<NotFound></NotFound>}></Route>
 			</Routes>
 		</div>
 	);

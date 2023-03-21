@@ -1,4 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { verifyEmail } from "../../api/auth";
+import { useNotification } from "../../hooks";
 import { commonModalClasses } from "../../utils/theme";
 import Container from "../Container";
 import FormContainer from "../form/FormContainer";
@@ -11,25 +14,36 @@ let currentOtpIndex = 0;
 export default function EmailVerification() {
 	const [otp, setOtp] = useState(new Array(OTP_LENGTH).fill(""));
 	const [activeOtpIndex, setActiveOtpIndex] = useState(0);
+	const { updateNotification } = useNotification();
 	const inputRef = useRef();
+	const navigate = useNavigate();
+	const { state } = useLocation();
+	const user = state?.user;
 
 	useEffect(() => {
-		console.log("ActiveL: ", activeOtpIndex);
-		console.log(inputRef);
 		inputRef.current?.focus();
 	}, [activeOtpIndex]);
+
+	useEffect(() => {
+		if (!user) navigate("/not-found");
+	}, [navigate, user]);
 
 	const focusNextInputField = (index) => {
 		setActiveOtpIndex(index + 1);
 	};
 
 	const focusPreviousInputField = (index) => {
-		console.log("Called with", index - 1);
 		if (index > 0) setActiveOtpIndex(index - 1);
 	};
 
+	const isValidOtp = (otp) => {
+		otp.forEach((val) => {
+			if (isNaN(parseInt(val))) return false;
+		});
+		return true;
+	};
+
 	const handleOtpChange = (e, index) => {
-		console.log("Changed");
 		const { value } = e.target;
 		const newOtp = [...otp];
 		newOtp[currentOtpIndex] = value.substring(value.length - 1, value.length);
@@ -48,10 +62,24 @@ export default function EmailVerification() {
 		setActiveOtpIndex(index);
 	};
 
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		// check if otp is valid
+		if (!isValidOtp(otp)) return updateNotification("error", "Invalid OTP!!!");
+		const { error } = await verifyEmail({
+			OTP: otp.join(""),
+			userObjId: user.id,
+		});
+
+		if (error) return updateNotification("error", error);
+		updateNotification("success", "User Verified!!!");
+		navigate("/auth/signin");
+	};
+
 	return (
 		<FormContainer>
 			<Container>
-				<form className={commonModalClasses}>
+				<form onSubmit={handleSubmit} className={commonModalClasses}>
 					<div>
 						<Title>Please enter the OTP to verify your account</Title>
 						<p className="text-center dark:text-dark-subtle text-light-subtle">
