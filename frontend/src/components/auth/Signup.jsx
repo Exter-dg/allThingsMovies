@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createUser } from "../../api/auth";
-import { useNotification } from "../../hooks";
+import { useAuth, useNotification } from "../../hooks";
+import { isValidEmail, isValidName } from "../../utils/helper";
 import { commonModalClasses } from "../../utils/theme";
 import Container from "../Container";
 import CustomLink from "../CustomLink";
@@ -11,11 +12,10 @@ import Submit from "../form/Submit";
 import Title from "../form/Title";
 
 export default function Signup() {
-	const userRegex = /[A-Z a-z]+$/;
-	const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-
 	const navigate = useNavigate();
 	const { updateNotification } = useNotification();
+	const { authInfo } = useAuth();
+	const { isLoggedIn } = authInfo;
 
 	const [userInfo, setUserInfo] = useState({
 		name: "",
@@ -35,10 +35,10 @@ export default function Signup() {
 	const validateUserInfo = (userInfo) => {
 		const { name, email, password } = userInfo;
 		if (!name.trim()) return { ok: false, error: "Name missing" };
-		if (!userRegex.test(name)) return { ok: false, error: "Invalid Name" };
+		if (!isValidName(name)) return { ok: false, error: "Invalid Name" };
 
 		if (!email.trim()) return { ok: false, error: "Email missing" };
-		if (!emailRegex.test(email)) return { ok: false, error: "Invalid Email" };
+		if (!isValidEmail(email)) return { ok: false, error: "Invalid Email" };
 
 		if (password.length < 8) return { ok: false, error: "Invalid Password" };
 
@@ -58,6 +58,10 @@ export default function Signup() {
 			replace: true,
 		});
 	};
+
+	useEffect(() => {
+		if (isLoggedIn) navigate("/");
+	}, [isLoggedIn]);
 
 	return (
 		<FormContainer>

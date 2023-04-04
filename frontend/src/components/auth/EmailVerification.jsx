@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { verifyEmail } from "../../api/auth";
-import { useNotification } from "../../hooks";
+import { resendEmailVerificationToken, verifyEmail } from "../../api/auth";
+import { useAuth, useNotification } from "../../hooks";
 import { commonModalClasses } from "../../utils/theme";
 import Container from "../Container";
 import FormContainer from "../form/FormContainer";
@@ -19,6 +19,9 @@ export default function EmailVerification() {
 	const navigate = useNavigate();
 	const { state } = useLocation();
 	const user = state?.user;
+	const { authInfo, isAuth } = useAuth();
+	const { isLoggedIn } = authInfo;
+	const isVerified = authInfo.profile?.isVerified;
 
 	useEffect(() => {
 		inputRef.current?.focus();
@@ -26,7 +29,8 @@ export default function EmailVerification() {
 
 	useEffect(() => {
 		if (!user) navigate("/not-found");
-	}, [navigate, user]);
+		if (isLoggedIn && isVerified) navigate("/");
+	}, [user, isLoggedIn, isVerified]);
 
 	const focusNextInputField = (index) => {
 		setActiveOtpIndex(index + 1);
@@ -66,14 +70,27 @@ export default function EmailVerification() {
 		e.preventDefault();
 		// check if otp is valid
 		if (!isValidOtp(otp)) return updateNotification("error", "Invalid OTP!!!");
-		const { error } = await verifyEmail({
+		const {
+			error,
+			message,
+			user: userResponse,
+		} = await verifyEmail({
 			OTP: otp.join(""),
 			userObjId: user.id,
 		});
-
 		if (error) return updateNotification("error", error);
-		updateNotification("success", "User Verified!!!");
-		navigate("/auth/signin");
+
+		const token = userResponse.jwt;
+		localStorage.setItem("auth-token", token);
+
+		isAuth();
+		updateNotification("success", message);
+	};
+
+	const handleResendEmailVerficationToken = async () => {
+		const { error, message } = await resendEmailVerificationToken(user.id);
+		if (error) return updateNotification("error", error);
+		updateNotification("success", message);
 	};
 
 	return (
@@ -107,7 +124,15 @@ export default function EmailVerification() {
 							);
 						})}
 					</div>
-					<Submit value="Verify"></Submit>
+					<div className="flex flex-col gap-3">
+						<Submit value="Verify"></Submit>
+						<button
+							type="button"
+							onClick={handleResendEmailVerficationToken}
+							className=" dark:text-gray-400 text-primary">
+							Resend OTP
+						</button>
+					</div>
 				</form>
 			</Container>
 		</FormContainer>

@@ -47,7 +47,6 @@ const create = async (req, res) => {
 };
 
 const verifyEmail = async (req, res) => {
-	console.log(req.body);
 	const { userObjId, OTP } = req.body;
 	if (!isValidObjectId(userObjId))
 		return sendError(res, "Invalid User Id", 401);
@@ -80,20 +79,30 @@ const verifyEmail = async (req, res) => {
 		<h1>We are excited to serve you at All Things Movies</h1>`,
 	});
 
-	res.status(201).json({ message: "Verification Successful" });
+	const jwtToken = jwt.sign({ userObjId: user._id }, process.env.JWT_SECRET);
+	res.status(201).json({
+		user: {
+			id: user._id,
+			name: user.name,
+			email: user.email,
+			jwt: jwtToken,
+			isVerified: user.isVerified,
+		},
+		message: "Verification Successful",
+	});
 };
 
 const resendEmailVerificationToken = async (req, res) => {
-	const { userObjId } = req.body;
-	if (!isValidObjectId(userObjId)) sendError(res, "Invalid User Id", 401);
+	const { userId } = req.body;
+	if (!isValidObjectId(userId)) return sendError(res, "Invalid User Id", 401);
 
-	const user = await User.findById(userObjId);
+	const user = await User.findById(userId);
 	if (!user) return sendError(res, "User not found", 401);
 
 	if (user.isVerified) return sendError(res, "User already verified", 401);
 
 	const existingToken = await EmailVerificationToken.findOne({
-		owner: userObjId,
+		owner: userId,
 	});
 	if (existingToken)
 		return sendError(res, "Only one OTP allowed per hour", 401);
@@ -142,7 +151,7 @@ const generateResetPasswordToken = async (req, res) => {
 	});
 
 	await passwordResetToken.save();
-	const passwordResetURL = `http://localhost:3000/reset-password?token=${token}&id=${user._id}`;
+	const passwordResetURL = `http://localhost:3000/auth/reset-password?token=${token}&id=${user._id}`;
 
 	const transport = await createMailTransport();
 	await transport.sendMail({
@@ -155,7 +164,7 @@ const generateResetPasswordToken = async (req, res) => {
 	});
 	res
 		.status(201)
-		.json({ message: "A Password Reset link has been on your email" });
+		.json({ message: "A Password Reset link has been sent on your email" });
 };
 
 const resetPassword = async (req, res) => {
@@ -195,7 +204,15 @@ const signIn = async (req, res) => {
 
 	const jwtToken = jwt.sign({ userObjId: user._id }, process.env.JWT_SECRET);
 
-	res.status(201).json({ id: user._id, name: user.name, email, jwt: jwtToken });
+	res.status(201).json({
+		user: {
+			id: user._id,
+			name: user.name,
+			email,
+			jwt: jwtToken,
+			isVerified: user.isVerified,
+		},
+	});
 };
 
 module.exports = {

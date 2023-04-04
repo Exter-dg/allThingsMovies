@@ -21,3 +21,83 @@ export const verifyEmail = async (body) => {
 		return err.message || err;
 	}
 };
+
+export const signInUser = async (body) => {
+	try {
+		const { data } = await client.post("/user/sign-in", body);
+		return data;
+	} catch (err) {
+		const { response } = err;
+		if (response?.data) return response.data;
+		return err.message || err;
+	}
+};
+
+export const getIsAuth = async (token) => {
+	try {
+		const { data } = await client.get("/user/is-auth", {
+			headers: {
+				Authorization: "Bearer " + token,
+				accept: "application/json",
+			},
+		});
+		return data;
+	} catch (err) {
+		const { response } = err;
+		if (response?.data) return response.data;
+		return err.message || err;
+	}
+};
+
+export const forgetPassword = async (email) => {
+	try {
+		const { data } = await client.post("/user/forget-password", { email });
+		return data;
+	} catch (err) {
+		const { response } = err;
+		if (response?.data) return response.data;
+		return err.message || err;
+	}
+};
+
+export const verifyPasswordResetToken = async (token, userId) => {
+	try {
+		const { data } = await client.post("/user/verifyPasswordResetToken", {
+			token,
+			userId,
+		});
+		return data;
+	} catch (err) {
+		const { response } = err;
+		if (response?.data) return response.data;
+		return err.message || err;
+	}
+};
+
+export const resetPassword = async (password, token, userId) => {
+	try {
+		const { data } = await client.post("/user/reset-password", {
+			token,
+			userId,
+			password,
+		});
+		return data;
+	} catch (err) {
+		const { response } = err;
+		if (response?.data) return response.data;
+		return err.message || err;
+	}
+};
+
+export const resendEmailVerificationToken = async (userId) => {
+	try {
+		const { data } = await client.post("/user/resend-verification-email", {
+			userId,
+		});
+		return data;
+	} catch (err) {
+		const { response } = err;
+		if (response?.data) return response.data;
+		return err.message || err;
+	}
+};

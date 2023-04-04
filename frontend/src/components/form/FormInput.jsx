@@ -7,7 +7,7 @@ export default function FormInput({ label, name, placeholder, ...rest }) {
 				id={name}
 				name={name}
 				className="bg-transparent rounded peer transition
-									border-2 dark:border-dark-subtle border-light-subtle p-1 
+									border-2 dark:border-dark-subtle border-light-subtle p-2
 									dark:text-white
 									w-full text-lg outline-none dark:focus:border-white
 									focus:border-primary"
