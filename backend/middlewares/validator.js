@@ -15,6 +15,20 @@ const userValidator = [
 		.withMessage("Password must be of 8-20 characters"),
 ];
 
+const actorValidator = [
+	check("name").trim().not().isEmpty().withMessage("Name cannot be empty!!!"),
+	check("about")
+		.trim()
+		.not()
+		.isEmpty()
+		.withMessage("About is a required field!"),
+	check("gender")
+		.trim()
+		.not()
+		.isEmpty()
+		.withMessage("Gender is a required field!!!"),
+];
+
 const passwordValidator = [
 	check("password")
 		.trim()
@@ -34,20 +48,21 @@ const signInValidator = [
 		.trim()
 		.not()
 		.isEmpty()
-		.withMessage("Password cannot be empty!!!")
+		.withMessage("Password cannot be empty!!!"),
 ];
 
 const validate = (req, res, next) => {
 	const errors = validationResult(req).array();
 	if (errors.length > 0) {
-		return res.json({error: errors[0].msg});
+		return res.json({ error: errors[0].msg });
 	}
 	next();
-}
+};
 
 module.exports = {
 	userValidator,
+	actorValidator,
 	passwordValidator,
 	signInValidator,
-	validate
-}
+	validate,
+};

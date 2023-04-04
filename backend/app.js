@@ -5,17 +5,19 @@ require("express-async-errors");
 require("dotenv").config();
 require("./db");
 
-const userRouter = require("./routes/user");
 const morgan = require("morgan");
 const { errorHandler } = require("./middlewares/errors");
 const { handleNotFound } = require("./utils/helper");
+const userRouter = require("./routes/user");
+const actorRouter = require("./routes/actor");
 
 const app = express();
 app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
-app.use("/api/user", userRouter);
 
+app.use("/api/user", userRouter);
+app.use("/api/actor", actorRouter);
 app.get("/about", (req, res) => {
 	res.send("About");
 });
