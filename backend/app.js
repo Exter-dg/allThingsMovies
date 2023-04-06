@@ -10,6 +10,7 @@ const { errorHandler } = require("./middlewares/errors");
 const { handleNotFound } = require("./utils/helper");
 const userRouter = require("./routes/user");
 const actorRouter = require("./routes/actor");
+const movieRouter = require("./routes/movie");
 
 const app = express();
 app.use(cors());
@@ -18,6 +19,8 @@ app.use(express.json());
 
 app.use("/api/user", userRouter);
 app.use("/api/actor", actorRouter);
+app.use("/api/movie", movieRouter);
+
 app.get("/about", (req, res) => {
 	res.send("About");
 });

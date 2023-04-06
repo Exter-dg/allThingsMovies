@@ -7,7 +7,7 @@ const {
 	getLatestActors,
 	getSingleActor,
 } = require("../controller/actor");
-const uploadImage = require("../middlewares/multer");
+const { uploadImage } = require("../middlewares/multer");
 const { actorValidator, validate } = require("../middlewares/validator");
 const { isAuth, isAdmin } = require("../middlewares/auth");
 const router = express.Router();

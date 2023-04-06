@@ -16,8 +16,19 @@ const uploadImageToCloud = async (path) => {
 	return { url, public_id };
 };
 
+const parseMovieData = async (req, res, next) => {
+	const { genres, tags, cast, writers, trailer } = req.body;
+	if (trailer) req.body.trailer = JSON.parse(trailer);
+	if (genres) req.body.genres = JSON.parse(genres);
+	if (tags) req.body.tags = JSON.parse(tags);
+	if (cast) req.body.cast = JSON.parse(cast);
+	if (writers) req.body.writers = JSON.parse(writers);
+	next();
+};
+
 module.exports = {
 	sendError,
 	handleNotFound,
 	uploadImageToCloud,
+	parseMovieData,
 };
