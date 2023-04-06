@@ -9,10 +9,13 @@ const {
 } = require("../controller/actor");
 const uploadImage = require("../middlewares/multer");
 const { actorValidator, validate } = require("../middlewares/validator");
+const { isAuth, isAdmin } = require("../middlewares/auth");
 const router = express.Router();
 
 router.post(
 	"/create",
+	isAuth,
+	isAdmin,
 	uploadImage.single("avatar"),
 	actorValidator,
 	validate,
@@ -21,15 +24,17 @@ router.post(
 
 router.post(
 	"/update/:actorId",
+	isAuth,
+	isAdmin,
 	uploadImage.single("avatar"),
 	actorValidator,
 	validate,
 	update
 );
 
-router.post("/delete/:actorId", deleteActor);
-router.get("/search", searchActor);
-router.get("/latest-uploads", getLatestActors);
+router.post("/delete/:actorId", isAuth, isAdmin, deleteActor);
+router.get("/search", isAuth, isAdmin, searchActor);
+router.get("/latest-uploads", isAuth, isAdmin, getLatestActors);
 router.get("/single/:id", getSingleActor);
 
 module.exports = router;

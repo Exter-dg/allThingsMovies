@@ -12,6 +12,7 @@ const jwt = require("jsonwebtoken");
 
 const create = async (req, res) => {
 	const { name, email, password } = req.body;
+	const role = req.body?.role;
 	// Check if user already exists
 	const oldUser = await User.findOne({ email });
 	if (oldUser) {
@@ -19,6 +20,7 @@ const create = async (req, res) => {
 	}
 	// Create a new record
 	const newUser = new User({ name, email, password });
+	if (role) newUser.role = role;
 	// Save the new user to database
 	await newUser.save();
 
