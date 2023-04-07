@@ -117,7 +117,6 @@ const movieValidator = [
 		.custom((trailer) => {
 			try {
 				const url = new URL(trailer.url);
-				console.log(url.protocol);
 				if (!url.protocol.includes("http"))
 					throw Error("Trailer URL is invalid!!!");
 				const arr = trailer.url.split("/");
@@ -130,10 +129,10 @@ const movieValidator = [
 				throw Error("Trailer URL is invalid!!!");
 			}
 		}),
-	check("poster").custom((_, { req }) => {
-		if (!req.file) throw Error("Poster must be present!!!");
-		return true;
-	}),
+	// check("poster").custom((_, { req }) => {
+	// 	if (!req.file) throw Error("Poster must be present!!!");
+	// 	return true;
+	// }),
 ];
 
 const validate = (req, res, next) => {
