@@ -89,6 +89,7 @@ const verifyEmail = async (req, res) => {
 			email: user.email,
 			jwt: jwtToken,
 			isVerified: user.isVerified,
+			role: user.role
 		},
 		message: "Verification Successful",
 	});
@@ -213,6 +214,7 @@ const signIn = async (req, res) => {
 			email,
 			jwt: jwtToken,
 			isVerified: user.isVerified,
+			role: user.role
 		},
 	});
 };
