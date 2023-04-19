@@ -45,7 +45,7 @@ export default function TagsInput() {
 			"dark:border-dark-subtle",
 			"border-light-subtle"
 		);
-		tagsInput.current.classList.remove("dark:border-white", "border-primary");
+		tagsInput.current.classList.remove("dark:border-white", "zborder-primary");
 	};
 
 	useEffect(() => {
@@ -58,7 +58,7 @@ export default function TagsInput() {
 				ref={tagsInput}
 				onKeyDown={handleKeyDown}
 				className="border-2 bg-transparent dark:border-dark-subtle border-light-subtle
-				px-2 h-10 rounded w-full text-white flex items-center space-x-2 overflow-x-auto
+				px-2 h-10 rounded w-full dark:text-white flex items-center space-x-2 overflow-x-auto
 				custom-scroll-bar transition">
 				{tags.map((tag) => (
 					<Tag onClick={() => removeTag(tag)} key={tag}>
