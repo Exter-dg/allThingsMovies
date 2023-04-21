@@ -47,7 +47,7 @@ export default function MovieUpload() {
 			flex items-center justify-center">
 			<div
 				className="dark:bg-primary bg-white rounded w-[45rem] h-[40rem] 
-				soverflow-auto p-2">
+				overflow-auto p-2 custom-scroll-bar">
 				{/* <UploadProgress
 					visible={!isVideoUploaded && isVideoSelected}
 					message={getUploadProgressMessage()}

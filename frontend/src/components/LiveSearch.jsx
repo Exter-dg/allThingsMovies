@@ -2,6 +2,7 @@ import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { commonInputClasses } from "../utils/theme";
 
 export default function LiveSearch({
+	name,
 	value = "",
 	placeholder = "",
 	results = [],
@@ -52,6 +53,8 @@ export default function LiveSearch({
 	return (
 		<div className="relative">
 			<input
+				id={name}
+				name={name}
 				type="text"
 				placeholder={placeholder}
 				onFocus={handleOnFocus}
@@ -96,7 +99,7 @@ const SearchResults = ({
 		<div
 			className="absolute right-0 left-0 top-10 bg-white 
 				dark:bg-secondary shadow-md p-2 max-h-64 overflow-auto
-				space-y-2 mt-1 custom-scroll-bar">
+				space-y-2 mt-1 custom-scroll-bar z-50">
 			{results.map((result, index) => {
 				const getSelectedClass = () => {
 					return selectedResultStyle
@@ -107,7 +110,7 @@ const SearchResults = ({
 				return (
 					<ResultCard
 						ref={index === focusedIndex ? resultsContainer : null}
-						key={result.key}
+						key={index.toString()}
 						item={result}
 						renderItem={renderItem}
 						resultContainerStyle={resultContainerStyle}
@@ -147,11 +150,3 @@ const ResultCard = forwardRef((props, ref) => {
 		</div>
 	);
 });
-
-{
-	/* <img
-				src={avatar}
-				alt={name}
-				className="w-16 h-16 rounded object-cover"></img>
-			<p className="dark:text-white font-semibold">{name}</p> */
-}
