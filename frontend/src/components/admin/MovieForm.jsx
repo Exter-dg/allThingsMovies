@@ -6,6 +6,8 @@ import Submit from "../form/Submit";
 import { useNotification } from "../../hooks";
 import ModalContainer from "../modals/ModalContainer";
 import WritersModal from "../modals/WritersModal";
+import CastForm from "../form/CastForm";
+import CastModal from "../modals/CastModal";
 
 export const results = [
 	{
@@ -49,27 +51,28 @@ const defaultMovieInfo = {
 	status: "",
 };
 
+export const renderItem = (result) => {
+	return (
+		<div key={result.id} className="flex space-x-2 rounded overflow-hidden">
+			<img
+				src={result.avatar}
+				alt={result.name}
+				className="w-16 h-16 object-cover"></img>
+			<p className="dark:text-white font-semibold">{result.name}</p>
+		</div>
+	);
+};
+
 export default function MovieForm() {
 	const [movieInfo, setMovieInfo] = useState({ ...defaultMovieInfo });
 	const [showWritersModal, setShowWritersModal] = useState(false);
+	const [showCastModal, setShowCastModal] = useState(false);
 
 	const { updateNotification } = useNotification();
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		console.log(movieInfo);
-	};
-
-	const renderItem = (result) => {
-		return (
-			<div key={result.key} className="flex space-x-2 rounded overflow-hidden">
-				<img
-					src={result.avatar}
-					alt={result.name}
-					className="w-16 h-16 object-cover"></img>
-				<p className="dark:text-white font-semibold">{result.name}</p>
-			</div>
-		);
 	};
 
 	const handleChange = ({ target }) => {
@@ -83,6 +86,11 @@ export default function MovieForm() {
 
 	const updateDirector = (profile) => {
 		setMovieInfo({ ...movieInfo, director: profile });
+	};
+
+	const updateCast = (newCast) => {
+		const { cast } = movieInfo;
+		setMovieInfo({ ...movieInfo, cast: [...cast, newCast] });
 	};
 
 	const updateWriters = (profile) => {
@@ -103,13 +111,20 @@ export default function MovieForm() {
 		const { writers } = movieInfo;
 		const newWriters = writers.filter(({ id }) => id !== profileId);
 		if (newWriters.length === 0) setShowWritersModal(false);
-		setMovieInfo({ ...movieInfo, writers: newWriters });
+		setMovieInfo({ ...movieInfo, writers: [...newWriters] });
 	};
 
-	const { title, storyLine, director, writers } = movieInfo;
+	const handleCastRemove = (profileId) => {
+		const { cast } = movieInfo;
+		const newCast = cast.filter(({ profile }) => profile.id !== profileId);
+		if (newCast.length === 0) setShowCastModal(false);
+		setMovieInfo({ ...movieInfo, cast: [...newCast] });
+	};
+
+	const { title, storyLine, director, writers, cast } = movieInfo;
 	return (
 		<>
-			<form onSubmit={handleSubmit} className="flex space-x-3">
+			<div className="flex space-x-3">
 				<div className="w-[70%] h-5 space-y-5">
 					<Label htmlFor="title">Title</Label>
 					<div>
@@ -153,13 +168,11 @@ export default function MovieForm() {
 							<LabelWithBadge badge={writers.length} htmlFor="writers">
 								Writers
 							</LabelWithBadge>
-							<button
-								onClick={() => setShowWritersModal(true)}
-								type="button"
-								className="dark:text-white text-primary
-							hover:underline transition">
+							<ViewAllButton
+								visible={writers.length}
+								onClick={() => setShowWritersModal(true)}>
 								View All
-							</button>
+							</ViewAllButton>
 						</div>
 						<LiveSearch
 							name="writers"
@@ -168,15 +181,34 @@ export default function MovieForm() {
 							onSelect={updateWriters}
 							renderItem={renderItem}></LiveSearch>
 					</div>
-					<Submit value="Upload"></Submit>
+					<div>
+						<div className="flex justify-between">
+							<LabelWithBadge badge={cast.length} htmlFor="writers">
+								Add Cast & Crew
+							</LabelWithBadge>
+							<ViewAllButton
+								onClick={() => setShowCastModal(true)}
+								visible={cast.length}>
+								View All
+							</ViewAllButton>
+						</div>
+						<CastForm onSubmit={updateCast}></CastForm>
+					</div>
+					<Submit value="Upload" onClick={handleSubmit} type="button"></Submit>
 				</div>
 				<div className="w-[30%] h-5 bg-blue-400"></div>
-			</form>
+			</div>
 			<WritersModal
 				visible={showWritersModal}
 				onRemoveClick={handleWritersRemove}
 				profiles={writers}
 				onClose={() => setShowWritersModal(false)}></WritersModal>
+
+			<CastModal
+				visible={showCastModal}
+				casts={cast}
+				onClose={() => setShowCastModal(false)}
+				onRemoveClick={handleCastRemove}></CastModal>
 		</>
 	);
 }
@@ -191,13 +223,14 @@ const Label = ({ children, htmlFor }) => {
 	);
 };
 
-const LabelWithBadge = ({ children, htmlFor, badge }) => {
+const LabelWithBadge = ({ children, htmlFor, badge = 0 }) => {
 	const renderBadge = () => {
+		if (!badge) return null;
 		return (
 			<span
 				className="dark:bg-dark-subtle bg-light-subtle absolute top-0 right-0
 				w-5 h-5 rounded-full flex justify-center items-center text-white
-				translate-x-4 -translate-y-2 text-xs">
+				translate-x-1 -translate-y-2 text-xs">
 				{badge <= 9 ? badge : "9+"}
 			</span>
 		);
@@ -207,5 +240,18 @@ const LabelWithBadge = ({ children, htmlFor, badge }) => {
 			<Label htmlFor={htmlFor}>{children}</Label>
 			{renderBadge()}
 		</div>
+	);
+};
+
+const ViewAllButton = ({ visible, children, onClick }) => {
+	if (!visible) return null;
+	return (
+		<button
+			onClick={onClick}
+			type="button"
+			className="dark:text-white text-primary
+hover:underline transition">
+			{children}
+		</button>
 	);
 };
