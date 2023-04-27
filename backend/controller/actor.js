@@ -80,7 +80,7 @@ const searchActor = async (req, res) => {
 	const query = req.query.name;
 	const result = await Actor.find({ $text: { $search: `"${query}"` } });
 	const actors = result.map((actor) => formatActor(actor));
-	res.json(actors);
+	res.json({ results: actors });
 };
 
 const getLatestActors = async (req, res) => {

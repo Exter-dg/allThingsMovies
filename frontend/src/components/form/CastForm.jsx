@@ -1,8 +1,9 @@
 import { useState } from "react";
 import LiveSearch from "../LiveSearch";
 import { commonInputClasses } from "../../utils/theme";
-import { renderItem, results } from "../admin/MovieForm";
-import { useNotification } from "../../hooks";
+import { useNotification, useSearch } from "../../hooks";
+import { renderItem } from "../../utils/helper";
+import { searchActor } from "../../api/actor";
 
 const defaultCastInfo = {
 	profile: {},
@@ -12,7 +13,11 @@ const defaultCastInfo = {
 
 export default function CastForm({ onSubmit }) {
 	const [castInfo, setCastInfo] = useState({ ...defaultCastInfo });
+	const [profiles, setProfiles] = useState([]);
+
 	const { updateNotification } = useNotification();
+	const { handleSearch, resetSearch } = useSearch();
+
 	const { leadActor, profile, roleAs } = castInfo;
 
 	const handleChange = ({ target }) => {
@@ -26,6 +31,15 @@ export default function CastForm({ onSubmit }) {
 		setCastInfo({ ...castInfo, profile });
 	};
 
+	const handleProfileChange = ({ target }) => {
+		const { value } = target;
+		const { profile } = castInfo;
+
+		profile.name = value;
+		setCastInfo({ ...castInfo, ...profile });
+		handleSearch(searchActor, value, setProfiles);
+	};
+
 	const handleSubmit = () => {
 		const { profile, roleAs } = castInfo;
 		if (!profile.name)
@@ -34,7 +48,9 @@ export default function CastForm({ onSubmit }) {
 			return updateNotification("error", "Cast role is missing");
 		console.log(castInfo);
 		onSubmit(castInfo);
-		setCastInfo({ ...defaultCastInfo });
+		setCastInfo({ ...defaultCastInfo, profile: { name: "" } });
+		resetSearch();
+		setProfiles([]);
 	};
 
 	return (
@@ -48,10 +64,11 @@ export default function CastForm({ onSubmit }) {
 				checked={leadActor}></input>
 			<LiveSearch
 				placeholder="Search Profile..."
-				results={results}
+				results={profiles}
 				onSelect={handleProfileSelect}
 				renderItem={renderItem}
-				value={profile.name}></LiveSearch>
+				value={profile.name}
+				onChange={handleProfileChange}></LiveSearch>
 			<span className="dark:text-dark-subtle text-light-subtle font-semibold">
 				as
 			</span>

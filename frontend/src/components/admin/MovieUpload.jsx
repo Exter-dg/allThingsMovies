@@ -41,7 +41,7 @@ export default function MovieUpload({ visible, onClose }) {
 	};
 
 	return (
-		<ModalContainer visible={visible} onClose={onClose}>
+		<ModalContainer visible={visible}>
 			{/* <UploadProgress
 					visible={!isVideoUploaded && isVideoSelected}
 					message={getUploadProgressMessage()}

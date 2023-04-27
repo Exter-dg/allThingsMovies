@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import TagsInput from "../TagsInput";
 import { commonInputClasses } from "../../utils/theme";
-import LiveSearch from "../LiveSearch";
 import Submit from "../form/Submit";
 import { useNotification } from "../../hooks";
-import ModalContainer from "../modals/ModalContainer";
 import WritersModal from "../modals/WritersModal";
 import CastForm from "../form/CastForm";
 import CastModal from "../modals/CastModal";
@@ -17,33 +15,11 @@ import {
 	statusOptions,
 	typeOptions,
 } from "../../utils/options";
-
-export const results = [
-	{
-		id: 1,
-		avatar:
-			"https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
-		name: "John Doe",
-	},
-	{
-		id: 2,
-		avatar:
-			"https://images.unsplash.com/photo-1524504388940-b1c1722653e1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
-		name: "John Doe2",
-	},
-	{
-		id: 3,
-		avatar:
-			"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
-		name: "John Doe3",
-	},
-	{
-		id: 4,
-		avatar:
-			"https://images.unsplash.com/photo-1463453091185-61582044d556?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
-		name: "John Doe4",
-	},
-];
+import Label from "../Label";
+import DirectorSelector from "../DirectorSelector";
+import WriterSelector from "../WriterSelector";
+import ViewAllButton from "../ViewAllButton";
+import LabelWithBadge from "../LabelWithBadge";
 
 const defaultMovieInfo = {
 	title: "",
@@ -58,18 +34,6 @@ const defaultMovieInfo = {
 	type: "",
 	language: "",
 	status: "",
-};
-
-export const renderItem = (result) => {
-	return (
-		<div key={result.id} className="flex space-x-2 rounded overflow-hidden">
-			<img
-				src={result.avatar}
-				alt={result.name}
-				className="w-16 h-16 object-cover"></img>
-			<p className="dark:text-white font-semibold">{result.name}</p>
-		</div>
-	);
 };
 
 export default function MovieForm() {
@@ -160,7 +124,6 @@ export default function MovieForm() {
 	const {
 		title,
 		storyLine,
-		director,
 		writers,
 		cast,
 		tags,
@@ -203,16 +166,9 @@ export default function MovieForm() {
 							name="tags"
 							onChange={updateTags}></TagsInput>
 					</div>
-					<div>
-						<Label htmlFor="director">Director</Label>
-						<LiveSearch
-							name="director"
-							value={director.name}
-							placeholder="Search Profile..."
-							results={results}
-							onSelect={updateDirector}
-							renderItem={renderItem}></LiveSearch>
-					</div>
+
+					<DirectorSelector onSelect={updateDirector}></DirectorSelector>
+
 					<div>
 						<div className="flex justify-between">
 							<LabelWithBadge badge={writers.length} htmlFor="writers">
@@ -224,12 +180,7 @@ export default function MovieForm() {
 								View All
 							</ViewAllButton>
 						</div>
-						<LiveSearch
-							name="writers"
-							placeholder="Search Profile..."
-							results={results}
-							onSelect={updateWriters}
-							renderItem={renderItem}></LiveSearch>
+						<WriterSelector onSelect={updateWriters}></WriterSelector>
 					</div>
 					<div>
 						<div className="flex justify-between">
@@ -302,46 +253,3 @@ export default function MovieForm() {
 		</>
 	);
 }
-
-const Label = ({ children, htmlFor }) => {
-	return (
-		<label
-			htmlFor={htmlFor}
-			className="dark:text-dark-subtle text-light-subtle font-semibold">
-			{children}
-		</label>
-	);
-};
-
-const LabelWithBadge = ({ children, htmlFor, badge = 0 }) => {
-	const renderBadge = () => {
-		if (!badge) return null;
-		return (
-			<span
-				className="dark:bg-dark-subtle bg-light-subtle absolute top-0 right-0
-				w-5 h-5 rounded-full flex justify-center items-center text-white
-				translate-x-1 -translate-y-2 text-xs">
-				{badge <= 9 ? badge : "9+"}
-			</span>
-		);
-	};
-	return (
-		<div className="relative">
-			<Label htmlFor={htmlFor}>{children}</Label>
-			{renderBadge()}
-		</div>
-	);
-};
-
-const ViewAllButton = ({ visible, children, onClick }) => {
-	if (!visible) return null;
-	return (
-		<button
-			onClick={onClick}
-			type="button"
-			className="dark:text-white text-primary
-hover:underline transition">
-			{children}
-		</button>
-	);
-};
