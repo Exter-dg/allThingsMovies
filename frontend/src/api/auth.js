@@ -1,3 +1,4 @@
+import { catchError } from "../utils/helper";
 import client from "./client";
 
 export const createUser = async (userInfo) => {
@@ -5,9 +6,7 @@ export const createUser = async (userInfo) => {
 		const { data } = await client.post("/user/create", userInfo);
 		return data;
 	} catch (err) {
-		const { response } = err;
-		if (response?.data) return response.data;
-		return err.message || err;
+		return catchError(err);
 	}
 };
 
@@ -16,9 +15,7 @@ export const verifyEmail = async (body) => {
 		const { data } = await client.post("/user/verify-email", body);
 		return data;
 	} catch (err) {
-		const { response } = err;
-		if (response?.data) return response.data;
-		return err.message || err;
+		return catchError(err);
 	}
 };
 
@@ -27,9 +24,7 @@ export const signInUser = async (body) => {
 		const { data } = await client.post("/user/sign-in", body);
 		return data;
 	} catch (err) {
-		const { response } = err;
-		if (response?.data) return response.data;
-		return err.message || err;
+		return catchError(err);
 	}
 };
 
@@ -43,9 +38,7 @@ export const getIsAuth = async (token) => {
 		});
 		return data;
 	} catch (err) {
-		const { response } = err;
-		if (response?.data) return response.data;
-		return err.message || err;
+		return catchError(err);
 	}
 };
 
@@ -54,9 +47,7 @@ export const forgetPassword = async (email) => {
 		const { data } = await client.post("/user/forget-password", { email });
 		return data;
 	} catch (err) {
-		const { response } = err;
-		if (response?.data) return response.data;
-		return err.message || err;
+		return catchError(err);
 	}
 };
 
@@ -68,9 +59,7 @@ export const verifyPasswordResetToken = async (token, userId) => {
 		});
 		return data;
 	} catch (err) {
-		const { response } = err;
-		if (response?.data) return response.data;
-		return err.message || err;
+		return catchError(err);
 	}
 };
 
@@ -83,9 +72,7 @@ export const resetPassword = async (password, token, userId) => {
 		});
 		return data;
 	} catch (err) {
-		const { response } = err;
-		if (response?.data) return response.data;
-		return err.message || err;
+		return catchError(err);
 	}
 };
 
@@ -96,8 +83,6 @@ export const resendEmailVerificationToken = async (userId) => {
 		});
 		return data;
 	} catch (err) {
-		const { response } = err;
-		if (response?.data) return response.data;
-		return err.message || err;
+		return catchError(err);
 	}
 };

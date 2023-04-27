@@ -8,7 +8,15 @@ const isValidName = (name) => {
 	return userRegex.test(name);
 };
 
-module.exports = {
-	isValidEmail,
-	isValidName,
+const getToken = () => {
+	const token = localStorage.getItem("auth-token");
+	return token;
 };
+
+const catchError = (err) => {
+	const { response } = err;
+	if (response?.data) return response.data;
+	return err.message || err;
+};
+
+export { isValidEmail, isValidName, getToken, catchError };

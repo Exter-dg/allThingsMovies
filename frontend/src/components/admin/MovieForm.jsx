@@ -257,6 +257,7 @@ export default function MovieForm() {
 					<PosterSelector
 						name="poster"
 						accept="image/jpg, image/jpeg, image/png"
+						label="Select Poster"
 						onChange={handleChange}
 						selectedPoster={selectedPosterForUI}></PosterSelector>
 					<GenresSelector

@@ -1,8 +1,9 @@
+import { catchError, getToken } from "../utils/helper";
 import client from "./client";
 
 export const uploadTrailer = async (formData, onProgressCallback) => {
 	try {
-		const token = localStorage.getItem("auth-token");
+		const token = getToken();
 		const { data } = await client.post("/movie/upload-trailer", formData, {
 			headers: {
 				Authorization: "Bearer " + token,
@@ -14,8 +15,6 @@ export const uploadTrailer = async (formData, onProgressCallback) => {
 		});
 		return data;
 	} catch (err) {
-		const { response } = err;
-		if (response?.data) return response.data;
-		return err.message || err;
+		return catchError(err);
 	}
 };
