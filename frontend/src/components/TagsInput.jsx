@@ -11,7 +11,8 @@ export default function TagsInput({ name, value, onChange }) {
 	const handleOnChange = ({ target }) => {
 		const { value } = target;
 		if (value !== ",") setTag(value);
-		onChange(tags);
+		// console.log("On change called with", tags);
+		// onChange(tags);
 	};
 
 	const handleKeyDown = ({ key }) => {
@@ -55,6 +56,10 @@ export default function TagsInput({ name, value, onChange }) {
 	useEffect(() => {
 		input.current?.scrollIntoView(false);
 	}, [tag]);
+
+	useEffect(() => {
+		onChange(tags);
+	}, [tags]);
 
 	return (
 		<div>

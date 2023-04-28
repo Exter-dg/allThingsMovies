@@ -144,7 +144,7 @@ const updateMovieWithoutPoster = async (req, res) => {
 
 const updateMovieWithPoster = async (req, res) => {
 	const movieId = req.params.movieId;
-	const {file} = req;
+	const { file } = req;
 	if (!file) return sendError(res, "Poster not found!!!");
 
 	if (!isValidObjectId(movieId)) return sendError(res, "Invalid Movie ID!!!");
@@ -201,35 +201,37 @@ const updateMovieWithPoster = async (req, res) => {
 			return sendError(res, "Unable to delete the file from cloud!");
 	}
 
-	// Upload new poster
-	const {
-		secure_url: url,
-		public_id,
-		responsive_breakpoints,
-	} = await cloudinary.uploader.upload(file.path, {
-		transformation: {
-			width: 1280,
-			height: 720,
-		},
-		responsive_breakpoints: {
-			create_derived: true,
-			max_width: 640,
-			max_images: 3,
-		},
-	});
-	movie.poster = {
-		url,
-		public_id,
-		responsive: [],
-	};
-	responsive_breakpoints[0].breakpoints.forEach((img) => {
-		const { secure_url } = img;
-		movie.poster.responsive.push(secure_url);
-	});
+	if (file) {
+		// Upload new poster
+		const {
+			secure_url: url,
+			public_id,
+			responsive_breakpoints,
+		} = await cloudinary.uploader.upload(file.path, {
+			transformation: {
+				width: 1280,
+				height: 720,
+			},
+			responsive_breakpoints: {
+				create_derived: true,
+				max_width: 640,
+				max_images: 3,
+			},
+		});
+		movie.poster = {
+			url,
+			public_id,
+			responsive: [],
+		};
+		responsive_breakpoints[0].breakpoints.forEach((img) => {
+			const { secure_url } = img;
+			movie.poster.responsive.push(secure_url);
+		});
+	}
 
 	await movie.save();
 	res.json({ message: "Movie Updated Successfully!", movie });
-}
+};
 
 const deleteMovie = async (req, res) => {
 	const movieId = req.params.movieId;
@@ -249,23 +251,22 @@ const deleteMovie = async (req, res) => {
 
 	// Delete Trailer
 	const existingTrailerId = movie.trailer?.public_id;
-	if (!existingTrailerId) return sendError(res, "Something went wrong. Trailer not found!!!");
+	if (!existingTrailerId)
+		return sendError(res, "Something went wrong. Trailer not found!!!");
 	const { result } = await cloudinary.uploader.destroy(existingTrailerId, {
-		resource_type: "video"
+		resource_type: "video",
 	});
 	if (result !== "ok")
 		return sendError(res, "Unable to delete the trailer from cloud!");
-	
+
 	await Movie.findByIdAndDelete(movieId);
-	res.json({message: "Movie Deleted Successfully"});
-
-
-}
+	res.json({ message: "Movie Deleted Successfully" });
+};
 
 module.exports = {
 	uploadTrailer,
 	createMovie,
 	updateMovieWithoutPoster,
 	updateMovieWithPoster,
-	deleteMovie	
+	deleteMovie,
 };
