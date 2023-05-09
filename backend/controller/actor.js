@@ -52,7 +52,7 @@ const update = async (req, res) => {
 	actor.about = about;
 	actor.gender = gender;
 	await actor.save();
-	res.status(201).json(formatActor(actor));
+	res.status(201).json({ actor: formatActor(actor) });
 };
 
 const deleteActor = async (req, res) => {
@@ -77,8 +77,13 @@ const deleteActor = async (req, res) => {
 };
 
 const searchActor = async (req, res) => {
-	const query = req.query.name;
-	const result = await Actor.find({ $text: { $search: `"${query}"` } });
+	const { name } = req.query;
+	if (!name) return sendError(res, "Invalid Request!!");
+
+	// const result = await Actor.find({ $text: { $search: `"${query.name}"` } });
+	const result = await Actor.find({
+		name: { $regex: name, $options: "i" },
+	});
 	const actors = result.map((actor) => formatActor(actor));
 	res.json({ results: actors });
 };
@@ -110,6 +115,19 @@ const formatActor = (actor) => {
 	};
 };
 
+const getActors = async (req, res) => {
+	const { pageNo, limit } = req.query;
+
+	const actors = await Actor.find({})
+		.sort({ createdAt: -1 })
+		.skip(parseInt(pageNo) * parseInt(limit))
+		.limit(parseInt(limit));
+
+	res.json({
+		profiles: actors.map((actor) => formatActor(actor)),
+	});
+};
+
 module.exports = {
 	create,
 	update,
@@ -117,4 +135,5 @@ module.exports = {
 	searchActor,
 	getLatestActors,
 	getSingleActor,
+	getActors,
 };

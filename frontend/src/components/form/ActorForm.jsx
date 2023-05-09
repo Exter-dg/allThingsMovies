@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { commonInputClasses } from "../../utils/theme";
 import PosterSelector from "../PosterSelector";
 import Selector from "../Selector";
@@ -38,7 +38,13 @@ const validateActor = ({ avatar, name, about, gender }) => {
 	return { error: null };
 };
 
-export default function ActorForm({ title, btnTitle, onSubmit, busy }) {
+export default function ActorForm({
+	title,
+	btnTitle,
+	onSubmit,
+	busy,
+	initialState,
+}) {
 	const [actorInfo, setActorInfo] = useState({ ...defaultActorInfo });
 	const [selectedAvatarforUI, setSelectedAvatarforUI] = useState("");
 	const { updateNotification } = useNotification();
@@ -71,6 +77,13 @@ export default function ActorForm({ title, btnTitle, onSubmit, busy }) {
 		// Submit form
 		onSubmit(formData);
 	};
+
+	useEffect(() => {
+		if (initialState) {
+			setActorInfo({ ...initialState, avatar: null });
+			setSelectedAvatarforUI(initialState.avatar);
+		}
+	}, [initialState]);
 
 	const { name, about, gender } = actorInfo;
 
