@@ -325,13 +325,36 @@ const getMovieForUpdate = async (req, res) => {
 	});
 };
 
+const searchMovies = async (req, res) => {
+	const { title } = req.query;
+	console.log("title: ", title);
+
+	if (!title.trim()) return sendError(res, "Invalid Request");
+
+	const movies = await Movie.find({
+		title: { $regex: title, $options: "i" },
+	});
+
+	res.json({
+		results: movies.map((m) => {
+			return {
+				id: m._id,
+				title: m.title,
+				poster: m.poster?.url,
+				genres: m.genres,
+				status: m.status,
+			};
+		}),
+	});
+};
+
 module.exports = {
 	uploadTrailer,
 	createMovie,
 	updateMovieWithoutPoster,
-	// updateMovieWithPoster,
 	updateMovie,
 	deleteMovie,
 	getMovies,
 	getMovieForUpdate,
+	searchMovies,
 };

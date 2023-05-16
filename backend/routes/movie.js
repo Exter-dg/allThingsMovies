@@ -8,6 +8,7 @@ const {
 	deleteMovie,
 	getMovies,
 	getMovieForUpdate,
+	searchMovies,
 } = require("../controller/movie");
 const {
 	movieValidator,
@@ -61,5 +62,6 @@ router.patch(
 router.delete("/:movieId", isAuth, isAdmin, deleteMovie);
 router.get("/movies", isAuth, isAdmin, getMovies);
 router.get("/for-update/:movieId", isAuth, isAdmin, getMovieForUpdate);
+router.get("/search", isAuth, isAdmin, searchMovies);
 
 module.exports = router;
