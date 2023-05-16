@@ -26,9 +26,21 @@ const parseMovieData = async (req, res, next) => {
 	next();
 };
 
+const formatActor = (actor) => {
+	const { name, gender, about, _id, avatar } = actor;
+	return {
+		id: _id,
+		name,
+		about,
+		gender,
+		avatar: avatar?.url,
+	};
+};
+
 module.exports = {
 	sendError,
 	handleNotFound,
 	uploadImageToCloud,
 	parseMovieData,
+	formatActor,
 };

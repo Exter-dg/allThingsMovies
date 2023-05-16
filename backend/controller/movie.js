@@ -1,7 +1,7 @@
 const { isValidObjectId } = require("mongoose");
 const cloudinary = require("../cloud");
 const Movie = require("../models/movie");
-const { sendError } = require("../utils/helper");
+const { sendError, formatActor } = require("../utils/helper");
 
 const uploadTrailer = async (req, res) => {
 	const { file } = req;
@@ -142,10 +142,10 @@ const updateMovieWithoutPoster = async (req, res) => {
 	res.json({ message: "Movie Updated Successfully!", movie });
 };
 
-const updateMovieWithPoster = async (req, res) => {
+const updateMovie = async (req, res) => {
 	const movieId = req.params.movieId;
 	const { file } = req;
-	if (!file) return sendError(res, "Poster not found!!!");
+	// if (!file) return sendError(res, "Poster not found!!!");
 
 	if (!isValidObjectId(movieId)) return sendError(res, "Invalid Movie ID!!!");
 
@@ -175,7 +175,6 @@ const updateMovieWithPoster = async (req, res) => {
 	movie.type = type;
 	movie.tags = tags;
 	movie.cast = cast;
-	movie.trailer = trailer;
 	movie.language = language;
 
 	if (director) {
@@ -193,15 +192,15 @@ const updateMovieWithPoster = async (req, res) => {
 		movie.writers = writers;
 	}
 
-	// Delete existing Poster - which will always exist ?
-	const existingPosterId = movie.poster?.public_id;
-	if (existingPosterId) {
-		const { result } = await cloudinary.uploader.destroy(existingPosterId);
-		if (result !== "ok")
-			return sendError(res, "Unable to delete the file from cloud!");
-	}
-
 	if (file) {
+		// Delete existing Poster - which will always exist ?
+		const existingPosterId = movie.poster?.public_id;
+		if (existingPosterId) {
+			const { result } = await cloudinary.uploader.destroy(existingPosterId);
+			if (result !== "ok")
+				return sendError(res, "Unable to delete the file from cloud!");
+		}
+
 		// Upload new poster
 		const {
 			secure_url: url,
@@ -230,7 +229,16 @@ const updateMovieWithPoster = async (req, res) => {
 	}
 
 	await movie.save();
-	res.json({ message: "Movie Updated Successfully!", movie });
+	res.json({
+		message: "Movie Updated Successfully!",
+		movie: {
+			id: movie._id,
+			poster: movie.poster?.url,
+			genres: movie.genres,
+			status: movie.status,
+			title: movie.title,
+		},
+	});
 };
 
 const deleteMovie = async (req, res) => {
@@ -283,11 +291,47 @@ const getMovies = async (req, res) => {
 	res.json({ movies: results });
 };
 
+const getMovieForUpdate = async (req, res) => {
+	const { movieId } = req.params;
+
+	if (!isValidObjectId(movieId)) return sendError(res, "Id is invalid");
+
+	const movie = await Movie.findById(movieId).populate(
+		"director writers cast.actor"
+	);
+	res.json({
+		movie: {
+			id: movie._id,
+			title: movie.title,
+			storyLine: movie.storyLine,
+			poster: movie.poster?.url,
+			releaseDate: movie.releaseDate,
+			status: movie.status,
+			type: movie.type,
+			language: movie.language,
+			genres: movie.genres,
+			tags: movie.tags,
+			director: formatActor(movie.director),
+			writers: movie.writers.map((w) => formatActor(w)),
+			cast: movie.cast.map((c) => {
+				return {
+					id: c.id,
+					profile: formatActor(c.actor),
+					roleAs: c.roleAs,
+					leadActor: c.leadActor,
+				};
+			}),
+		},
+	});
+};
+
 module.exports = {
 	uploadTrailer,
 	createMovie,
 	updateMovieWithoutPoster,
-	updateMovieWithPoster,
+	// updateMovieWithPoster,
+	updateMovie,
 	deleteMovie,
 	getMovies,
+	getMovieForUpdate,
 };

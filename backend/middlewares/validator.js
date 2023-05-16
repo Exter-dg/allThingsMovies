@@ -111,29 +111,31 @@ const movieValidator = [
 			});
 			return true;
 		}),
-	check("trailer")
-		.isObject()
-		.withMessage("Trailer Info must be an object with url and public_id!!!")
-		.custom((trailer) => {
-			try {
-				const url = new URL(trailer.url);
-				if (!url.protocol.includes("http"))
-					throw Error("Trailer URL is invalid!!!");
-				const arr = trailer.url.split("/");
-				const publicId = arr[arr.length - 1].split(".")[0];
-				if (trailer.public_id !== publicId)
-					throw Error("Public ID is invalid!!!");
-				return true;
-			} catch (e) {
-				console.log(e);
-				throw Error("Trailer URL is invalid!!!");
-			}
-		}),
+
 	// check("poster").custom((_, { req }) => {
 	// 	if (!req.file) throw Error("Poster must be present!!!");
 	// 	return true;
 	// }),
 ];
+
+const validateTrailer = check("trailer")
+	.isObject()
+	.withMessage("Trailer Info must be an object with url and public_id!!!")
+	.custom((trailer) => {
+		try {
+			const url = new URL(trailer.url);
+			if (!url.protocol.includes("http"))
+				throw Error("Trailer URL is invalid!!!");
+			const arr = trailer.url.split("/");
+			const publicId = arr[arr.length - 1].split(".")[0];
+			if (trailer.public_id !== publicId)
+				throw Error("Public ID is invalid!!!");
+			return true;
+		} catch (e) {
+			console.log(e);
+			throw Error("Trailer URL is invalid!!!");
+		}
+	});
 
 const validate = (req, res, next) => {
 	const errors = validationResult(req).array();
@@ -149,5 +151,6 @@ module.exports = {
 	passwordValidator,
 	signInValidator,
 	movieValidator,
+	validateTrailer,
 	validate,
 };

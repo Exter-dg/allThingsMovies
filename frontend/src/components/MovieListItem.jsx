@@ -1,16 +1,8 @@
 import React from "react";
 import { BsBoxArrowUpRight, BsPencilSquare, BsTrash } from "react-icons/bs";
 
-const MovieListItem = ({ movie }) => {
-	const {
-		poster,
-		title,
-		genres = [],
-		status,
-		onDeleteClick,
-		onEditClick,
-		onOpenClick,
-	} = movie;
+const MovieListItem = ({ movie, onDeleteClick, onEditClick, onOpenClick }) => {
+	const { poster, title, genres = [], status } = movie;
 	return (
 		<table className="w-full border-b ">
 			<tbody>
