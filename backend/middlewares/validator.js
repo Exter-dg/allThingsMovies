@@ -137,6 +137,11 @@ const validateTrailer = check("trailer")
 		}
 	});
 
+const ratingValidator = check(
+	"rating",
+	"Rating must be a number between 0 and 10."
+).isFloat({ min: 0, max: 10 });
+
 const validate = (req, res, next) => {
 	const errors = validationResult(req).array();
 	if (errors.length > 0) {
@@ -152,5 +157,6 @@ module.exports = {
 	signInValidator,
 	movieValidator,
 	validateTrailer,
+	ratingValidator,
 	validate,
 };
