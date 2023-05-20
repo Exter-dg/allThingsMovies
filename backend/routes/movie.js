@@ -9,6 +9,10 @@ const {
 	getMovies,
 	getMovieForUpdate,
 	searchMovies,
+	getLatestUploads,
+	getSingleMovie,
+	getRelatedMovies,
+	getTopRatedMovies,
 } = require("../controller/movie");
 const {
 	movieValidator,
@@ -63,5 +67,11 @@ router.delete("/:movieId", isAuth, isAdmin, deleteMovie);
 router.get("/movies", isAuth, isAdmin, getMovies);
 router.get("/for-update/:movieId", isAuth, isAdmin, getMovieForUpdate);
 router.get("/search", isAuth, isAdmin, searchMovies);
+
+// for normal users
+router.get("/latest-uploads", getLatestUploads);
+router.get("/single/:movieId", getSingleMovie);
+router.get("/related/:movieId", getRelatedMovies);
+router.get("/top-rated", getTopRatedMovies);
 
 module.exports = router;
