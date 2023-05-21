@@ -10,13 +10,14 @@ import NotFound from "./components/NotFound";
 import Navbar from "./components/user/Navbar";
 import { useAuth } from "./hooks";
 import AdminNavigator from "./navigator/AdminNavigator";
+import SingleMovie from "./components/user/SingleMovie";
 
 export default function App() {
-	const {authInfo} = useAuth();
+	const { authInfo } = useAuth();
 	console.log(authInfo);
 	const isAdmin = authInfo.profile?.role === "admin";
 
-	if (isAdmin) return <AdminNavigator></AdminNavigator>
+	if (isAdmin) return <AdminNavigator></AdminNavigator>;
 	return (
 		<div>
 			<Navbar></Navbar>
@@ -33,6 +34,9 @@ export default function App() {
 				<Route
 					path="/auth/reset-password"
 					element={<ConfirmPassword></ConfirmPassword>}></Route>
+				<Route
+					path="/movie/:movieId"
+					element={<SingleMovie></SingleMovie>}></Route>
 				<Route path="*" element={<NotFound></NotFound>}></Route>
 			</Routes>
 		</div>
