@@ -78,3 +78,14 @@ export const getActors = async (pageNo, limit) => {
 		return catchError(err);
 	}
 };
+
+export const getActorProfile = async (id) => {
+	const token = getToken();
+	console.log("Token: ", token);
+	try {
+		const { data } = await client.get(`/actor/${id}`);
+		return data;
+	} catch (err) {
+		return catchError(err);
+	}
+};

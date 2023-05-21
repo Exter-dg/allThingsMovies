@@ -31,4 +31,19 @@ const renderItem = (result) => {
 	);
 };
 
-export { isValidEmail, isValidName, getToken, catchError, renderItem };
+const getPoster = (posters = []) => {
+	const { length } = posters;
+	if (!length) return null;
+
+	if (length > 2) return posters[1];
+	return posters[0];
+};
+
+export {
+	isValidEmail,
+	isValidName,
+	getToken,
+	catchError,
+	renderItem,
+	getPoster,
+};

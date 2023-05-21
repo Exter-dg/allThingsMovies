@@ -87,6 +87,7 @@ const relatedMovieAggregation = (tags, movieId) => {
 			$project: {
 				title: 1,
 				poster: "$poster.url",
+				responsivePosters: "$poster.responsive",
 			},
 		},
 		{
@@ -116,6 +117,7 @@ const topRatedMoviesPipeline = (type) => {
 			$project: {
 				title: 1,
 				poster: "$poster.url",
+				responsivePosters: "$poster.responsive",
 				reviewCount: {
 					$size: "$reviews",
 				},

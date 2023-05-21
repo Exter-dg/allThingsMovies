@@ -37,6 +37,6 @@ router.delete("/:actorId", isAuth, isAdmin, deleteActor);
 router.get("/search", isAuth, isAdmin, searchActor);
 router.get("/latest-uploads", isAuth, isAdmin, getLatestActors);
 router.get("/actors", isAuth, isAdmin, getActors);
-router.get("/single/:id", getSingleActor);
+router.get("/:id", getSingleActor);
 
 module.exports = router;

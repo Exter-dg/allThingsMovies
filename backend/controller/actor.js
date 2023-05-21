@@ -101,7 +101,7 @@ const getSingleActor = async (req, res) => {
 
 	const actor = await Actor.findById(actorId);
 	if (!actor) return sendError(res, "Invalid Request! Actor not found!", 404);
-	res.json(formatActor(actor));
+	res.json({ actor: formatActor(actor) });
 };
 
 const formatActor = (actor) => {
