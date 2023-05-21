@@ -54,7 +54,7 @@ export const getMovies = async (pageNo, limit) => {
 export const getMovieForUpdate = async (id) => {
 	try {
 		const token = getToken();
-		const { data } = await client.get("movie/for-update/" + id, {
+		const { data } = await client.get("/movie/for-update/" + id, {
 			headers: {
 				Authorization: "Bearer " + token,
 			},
@@ -68,7 +68,7 @@ export const getMovieForUpdate = async (id) => {
 export const updateMovie = async (id, formData) => {
 	try {
 		const token = getToken();
-		const { data } = await client.patch("movie/update/" + id, formData, {
+		const { data } = await client.patch("/movie/update/" + id, formData, {
 			headers: {
 				Authorization: "Bearer " + token,
 				"Content-Type": "multipart/form-data",
@@ -83,7 +83,7 @@ export const updateMovie = async (id, formData) => {
 export const deleteMovie = async (id) => {
 	try {
 		const token = getToken();
-		const { data } = await client.delete("movie/" + id, {
+		const { data } = await client.delete("/movie/" + id, {
 			headers: {
 				Authorization: "Bearer " + token,
 			},
@@ -97,7 +97,7 @@ export const deleteMovie = async (id) => {
 export const searchMoviesForAdmin = async (title) => {
 	try {
 		const token = getToken();
-		const { data } = await client.get("movie/search?title=" + title, {
+		const { data } = await client.get("/movie/search?title=" + title, {
 			headers: {
 				Authorization: "Bearer " + token,
 			},
