@@ -127,3 +127,21 @@ export const getLatestUploads = async () => {
 		return catchError(err);
 	}
 };
+
+export const getSingleMovie = async (id) => {
+	try {
+		const { data } = await client("/movie/single/" + id);
+		return data;
+	} catch (err) {
+		return catchError(err);
+	}
+};
+
+export const getRelatedMovies = async (id) => {
+	try {
+		const { data } = await client("/movie/related/" + id);
+		return data;
+	} catch (err) {
+		return catchError(err);
+	}
+};

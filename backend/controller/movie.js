@@ -473,7 +473,7 @@ const getRelatedMovies = async (req, res) => {
 
 	const relatedMovies = Promise.all(movies.map(mapMovies));
 
-	res.json({ relatedMovies });
+	res.json({ movies: relatedMovies });
 };
 
 const getTopRatedMovies = async (req, res) => {
