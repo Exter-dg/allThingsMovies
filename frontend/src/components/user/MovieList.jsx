@@ -14,9 +14,11 @@ export default function MovieList({ title, movies = [] }) {
 	if (!movies.length) return null;
 	return (
 		<div>
-			<h1 className="text-2xl dark:text-white text-secondary font-semibold mb-5">
-				{title}
-			</h1>
+			{title && (
+				<h1 className="text-2xl dark:text-white text-secondary font-semibold mb-5">
+					{title}
+				</h1>
+			)}
 			<GridContainer>
 				{movies.map((movie) => {
 					return <ListItem key={movie.id} movie={movie}></ListItem>;
@@ -31,7 +33,7 @@ const ListItem = ({ movie }) => {
 	return (
 		<Link to={"/movie/" + id}>
 			<img
-				className="aspect-video object-cover"
+				className="aspect-video object-cover w-full"
 				src={getPoster(responsivePosters) || poster}
 				alt={title}></img>
 			<h1

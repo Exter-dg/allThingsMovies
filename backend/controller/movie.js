@@ -362,6 +362,44 @@ const searchMovies = async (req, res) => {
 	});
 };
 
+const searchPublicMovies = async (req, res) => {
+	const { title } = req.query;
+	console.log("title: ", title);
+
+	if (!title.trim()) return sendError(res, "Invalid Request");
+
+	const movies = await Movie.find({
+		title: { $regex: title, $options: "i" },
+		status: "public",
+	});
+
+	const mapMovies = async (m) => {
+		const reviews = await getAverageRatings(m._id);
+		return {
+			id: m._id,
+			title: m.title,
+			poster: m.poster?.url,
+			responsivePosters: m.poster?.responsive,
+			reviews: { ...reviews },
+		};
+	};
+
+	const results = await Promise.all(movies.map(mapMovies));
+	res.json({ results });
+
+	res.json({
+		results: movies.map((m) => {
+			return {
+				id: m._id,
+				title: m.title,
+				poster: m.poster?.url,
+				genres: m.genres,
+				status: m.status,
+			};
+		}),
+	});
+};
+
 const getLatestUploads = async (req, res) => {
 	const { limit = 5 } = req.query;
 
@@ -516,4 +554,5 @@ module.exports = {
 	getSingleMovie,
 	getRelatedMovies,
 	getTopRatedMovies,
+	searchPublicMovies,
 };
