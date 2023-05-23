@@ -11,6 +11,7 @@ import Navbar from "./components/user/Navbar";
 import { useAuth } from "./hooks";
 import AdminNavigator from "./navigator/AdminNavigator";
 import SingleMovie from "./components/user/SingleMovie";
+import MovieReviews from "./components/user/MovieReviews";
 
 export default function App() {
 	const { authInfo } = useAuth();
@@ -37,6 +38,9 @@ export default function App() {
 				<Route
 					path="/movie/:movieId"
 					element={<SingleMovie></SingleMovie>}></Route>
+				<Route
+					path="/movie/reviews/:movieId"
+					element={<MovieReviews></MovieReviews>}></Route>
 				<Route path="*" element={<NotFound></NotFound>}></Route>
 			</Routes>
 		</div>
