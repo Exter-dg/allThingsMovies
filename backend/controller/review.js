@@ -7,6 +7,8 @@ exports.addReview = async (req, res) => {
 	const { movieId } = req.params;
 	const { content, rating } = req.body;
 	const userId = req.user._id;
+	if (!req.user.isVerified)
+		return sendError(res, "Please Verify your email first");
 
 	if (!isValidObjectId(movieId)) return sendError(res, "Invalid Movie Id");
 

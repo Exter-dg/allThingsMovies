@@ -16,6 +16,8 @@ const MoviesProvider = ({ children }) => {
 
 	const fetchLatestUploads = async (qty = 5) => {
 		const { error, movies } = await getMovies(0, qty);
+		console.log("error:", error);
+
 		if (error) return updateNotification("error", error);
 
 		setLatestUploads([...movies]);
